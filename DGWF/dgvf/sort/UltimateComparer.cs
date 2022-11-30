@@ -2,9 +2,9 @@
 
 public class UltimateComparer<T> : IComparer<T>
 {
-    private SortParameters _sortParameters;
+    private IEnumerable<SortParameter> _sortParameters;
 
-    public UltimateComparer(SortParameters sortParameters)
+    public UltimateComparer(IEnumerable<SortParameter> sortParameters)
     {
         _sortParameters = sortParameters;
     }
@@ -15,7 +15,7 @@ public class UltimateComparer<T> : IComparer<T>
         if (ReferenceEquals(null, y)) return 1;
         if (ReferenceEquals(null, x)) return -1;
 
-        foreach (var sortParameter in _sortParameters.list)
+        foreach (var sortParameter in _sortParameters)
         {
             if (sortParameter.Direction.Equals(SortDirection.None))
                 continue;

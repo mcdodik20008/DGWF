@@ -12,7 +12,7 @@ public class DataGridViewWithFilter<TValue,TFilter> : DataGridView where TFilter
     private int _columnIndex;
     private readonly TFilter _filter;
     private List<TValue> _values = new();
-    private readonly IMapper _filterSorterMapper;
+    private readonly IMapper _mapper;
     private readonly List<FilterSorterColumn> _filterColumns = new();
 
     #region controls
@@ -27,16 +27,16 @@ public class DataGridViewWithFilter<TValue,TFilter> : DataGridView where TFilter
 
     #endregion
 
-    public DataGridViewWithFilter(TFilter filter, IMapper filterSorterMapper)
+    public DataGridViewWithFilter(TFilter filter, IMapper mapper)
     {
         _filter = filter;
-        _filterSorterMapper = filterSorterMapper;
+        _mapper = mapper;
     }
     
-    public DataGridViewWithFilter(IFilterFactory factory, IMapper filterSorterMapper)
+    public DataGridViewWithFilter(IFilterFactory factory, IMapper mapper)
     {
         _filter = factory.Find<TFilter>();
-        _filterSorterMapper = filterSorterMapper;
+        _mapper = mapper;
     }
 
     public void Reset()
@@ -99,7 +99,7 @@ public class DataGridViewWithFilter<TValue,TFilter> : DataGridView where TFilter
         foreach (var column in _filterColumns.OrderBy(x => x.Order))
         {
             var prop = typeof(T).GetProperty(column.Property.Name);
-            var val = _filterSorterMapper.Map<string, SortDirection>(column.ValueSorter);
+            var val = _mapper.Map<string, SortDirection>(column.ValueSorter);
             parameters.Add(new SortParameter(prop, val));
         }
         return parameters;
@@ -122,8 +122,8 @@ public class DataGridViewWithFilter<TValue,TFilter> : DataGridView where TFilter
             var popName = property.GetCustomAttribute<SourseNameAttribute>()?.Name;
             var filterColumn = filterColumns.FirstOrDefault(x => x.Name.Equals(popName));
             var parameters = Equals(filterColumn, null) || Equals(filterColumn.Value, "")
-                ? new object[] { _filterSorterMapper, "", "" }
-                : new object[] { _filterSorterMapper, filterColumn.Value, filterColumn.ValueFilter };
+                ? new object[] { _mapper, "", "" }
+                : new object[] { _mapper, filterColumn.Value, filterColumn.ValueFilter };
             updateFilterFieldMethod.Invoke(value, parameters);
         }
 
